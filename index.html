@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Band Quiz — Email confirmed</title>
+
+<!-- Same families the postrehy.sk site loads. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #0e0d0c;
+    --ink: #f0ece4;
+    --ink-soft: #b8b2a6;
+    --ink-faint: #6b6660;
+    --accent: #cd1c18;
+    --line: #2a2724;
+    --card: #14130f;
+    --r-lg: 22px;
+    --r-pill: 999px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Manrope', sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(205, 28, 24, 0.025) 0%, transparent 40%),
+      radial-gradient(circle at 80% 60%, rgba(205, 28, 24, 0.015) 0%, transparent 40%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 520px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 44px 36px 36px;
+    text-align: center;
+  }
+
+  .mark {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 24px;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .mark svg { width: 30px; height: 30px; stroke: var(--accent); fill: none;
+              stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-bottom: 14px;
+  }
+
+  p.body { color: var(--ink-soft); font-size: 15.5px; }
+
+  .hint {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-faint);
+    font-size: 13px;
+  }
+
+  /* Language switch — same monospace pill idiom as the site's toggle. */
+  .langs { margin-top: 22px; display: flex; gap: 6px; justify-content: center; }
+  .langs button {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--ink-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 5px 11px;
+    border-radius: var(--r-pill);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .langs button:hover { color: var(--ink); border-color: var(--ink-faint); }
+  .langs button.active { color: var(--ink); border-color: var(--accent); }
+
+  @media (max-width: 420px) {
+    .card { padding: 34px 22px 28px; }
+    h1 { font-size: 25px; }
+  }
+</style>
+</head>
+<body>
+
+<main class="card">
+  <div class="mark">
+    <!-- Swapped for an alert glyph when the link didn't verify. -->
+    <svg id="glyph" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  </div>
+
+  <div class="eyebrow">Good Vibrationz &middot; Band Quiz</div>
+  <h1 id="title">Email confirmed</h1>
+  <p class="body" id="body">Your account is ready.</p>
+
+  <div class="hint" id="hint">You can close this window.</div>
+
+  <div class="langs" id="langs"></div>
+</main>
+
+<script>
+(function () {
+  // ---------------------------------------------------------------------
+  // Supabase sends the outcome in the URL FRAGMENT (#...), never the query
+  // string — so none of this ever reaches the web server. On success the
+  // fragment carries access_token/refresh_token; on failure it carries
+  // error / error_code (otp_expired is the common one: confirmation links
+  // are single-use, and some mail providers' link scanners consume them
+  // before the recipient clicks).
+  // ---------------------------------------------------------------------
+  var params = new URLSearchParams(location.hash.replace(/^#/, ''));
+  var failed = !!(params.get('error') || params.get('error_code'));
+
+  // Drop the tokens from the address bar immediately. They are live
+  // credentials: anyone who gets this URL from history or a screenshot
+  // would hold a working session.
+  if (location.hash) {
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+
+  var COPY = {
+    en: {
+      ok:   ['Email confirmed', 'Your Band Quiz account is ready. Open the app and sign in with your email and password.'],
+      bad:  ['This link is no longer valid', 'Confirmation links can be used only once and expire after a while. Open Band Quiz and ask for a new confirmation email.'],
+      hint: 'You can close this window.'
+    },
+    sk: {
+      ok:   ['E-mail potvrdený', 'Tvoj účet v Band Quiz je pripravený. Otvor aplikáciu a prihlás sa svojím e-mailom a heslom.'],
+      bad:  ['Tento odkaz už neplatí', 'Potvrdzovacie odkazy sa dajú použiť iba raz a po čase strácajú platnosť. Otvor Band Quiz a vyžiadaj si nový potvrdzovací e-mail.'],
+      hint: 'Toto okno môžeš zavrieť.'
+    },
+    de: {
+      ok:   ['E-Mail bestätigt', 'Dein Band-Quiz-Konto ist bereit. Öffne die App und melde dich mit deiner E-Mail-Adresse und deinem Passwort an.'],
+      bad:  ['Dieser Link ist nicht mehr gültig', 'Bestätigungslinks können nur einmal verwendet werden und laufen nach einiger Zeit ab. Öffne Band Quiz und fordere eine neue Bestätigungs-E-Mail an.'],
+      hint: 'Du kannst dieses Fenster schließen.'
+    },
+    cs: {
+      ok:   ['E-mail potvrzen', 'Tvůj účet v Band Quiz je připraven. Otevři aplikaci a přihlas se svým e-mailem a heslem.'],
+      bad:  ['Tento odkaz už neplatí', 'Potvrzovací odkazy lze použít pouze jednou a po čase vyprší. Otevři Band Quiz a vyžádej si nový potvrzovací e-mail.'],
+      hint: 'Toto okno můžeš zavřít.'
+    }
+  };
+
+  var ORDER = ['en', 'sk', 'de', 'cs'];
+  var CHECK = 'M20 6 9 17l-5-5';
+  var ALERT = 'M12 8v5M12 16.5v.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z';
+
+  function render(lang) {
+    var c = COPY[lang];
+    var text = failed ? c.bad : c.ok;
+    document.getElementById('title').textContent = text[0];
+    document.getElementById('body').textContent = text[1];
+    document.getElementById('hint').textContent = c.hint;
+    document.getElementById('glyph').firstElementChild.setAttribute('d', failed ? ALERT : CHECK);
+    document.documentElement.lang = lang;
+    document.title = 'Band Quiz — ' + text[0];
+    Array.prototype.forEach.call(document.querySelectorAll('.langs button'), function (b) {
+      b.classList.toggle('active', b.dataset.lang === lang);
+    });
+  }
+
+  var box = document.getElementById('langs');
+  ORDER.forEach(function (lang) {
+    var b = document.createElement('button');
+    b.textContent = lang.toUpperCase();
+    b.dataset.lang = lang;
+    b.addEventListener('click', function () { render(lang); });
+    box.appendChild(b);
+  });
+
+  // Open in the visitor's own language when we speak it, else English.
+  var pref = (navigator.language || 'en').slice(0, 2).toLowerCase();
+  render(ORDER.indexOf(pref) > -1 ? pref : 'en');
+})();
+</script>
+
+</body>
+</html>
