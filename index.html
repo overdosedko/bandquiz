@@ -213,7 +213,7 @@
     document.getElementById('glyph').firstElementChild.setAttribute('d', GLYPH[state]);
     document.documentElement.lang = lang;
     // The neutral heading is already the product name — don't repeat it.
-    document.title = state === 'none' ? 'Band Quiz' : 'Band Quiz — ' + text[0];
+    document.title = state === 'none' ? 'The Band Quiz' : 'The Band Quiz — ' + text[0];
     Array.prototype.forEach.call(document.querySelectorAll('.langs button'), function (b) {
       b.classList.toggle('active', b.dataset.lang === lang);
     });
