@@ -100,7 +100,7 @@
   }
 
   /* Language switch — same monospace pill idiom as the site's toggle. */
-  .langs { margin-top: 22px; display: flex; gap: 6px; justify-content: center; }
+  .langs { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
   .langs button {
     background: none;
     border: 1px solid var(--line);
@@ -191,10 +191,49 @@
       bad:  ['Tento odkaz už neplatí', 'Potvrzovací odkazy lze použít pouze jednou a po čase vyprší. Otevři The Band Quiz a vyžádej si nový potvrzovací e-mail.'],
       none: ['The Band Quiz', 'Otevři The Band Quiz v telefonu a přihlas se svým e-mailem a heslem.'],
       hint: 'Toto okno můžeš zavřít.'
+    },
+    es: {
+      ok:   ['Correo confirmado', 'Tu cuenta de The Band Quiz está lista. Abre la aplicación e inicia sesión con tu correo y tu contraseña.'],
+      bad:  ['Este enlace ya no es válido', 'Los enlaces de confirmación solo se pueden usar una vez y caducan al cabo de un tiempo. Abre The Band Quiz y pide un nuevo correo de confirmación.'],
+      none: ['The Band Quiz', 'Abre The Band Quiz en tu teléfono e inicia sesión con tu correo y tu contraseña.'],
+      hint: 'Ya puedes cerrar esta ventana.'
+    },
+    fr: {
+      ok:   ['E-mail confirmé', 'Ton compte The Band Quiz est prêt. Ouvre l’application et connecte-toi avec ton e-mail et ton mot de passe.'],
+      bad:  ['Ce lien n’est plus valide', 'Les liens de confirmation ne servent qu’une seule fois et expirent au bout d’un moment. Ouvre The Band Quiz et demande un nouvel e-mail de confirmation.'],
+      none: ['The Band Quiz', 'Ouvre The Band Quiz sur ton téléphone et connecte-toi avec ton e-mail et ton mot de passe.'],
+      hint: 'Tu peux fermer cette fenêtre.'
+    },
+    pt: {
+      ok:   ['E-mail confirmado', 'Sua conta do The Band Quiz está pronta. Abra o aplicativo e entre com seu e-mail e sua senha.'],
+      bad:  ['Este link não é mais válido', 'Os links de confirmação só podem ser usados uma vez e expiram depois de um tempo. Abra o The Band Quiz e peça um novo e-mail de confirmação.'],
+      none: ['The Band Quiz', 'Abra o The Band Quiz no seu celular e entre com seu e-mail e sua senha.'],
+      hint: 'Você já pode fechar esta janela.'
+    },
+    nb: {
+      ok:   ['E-posten er bekreftet', 'The Band Quiz-kontoen din er klar. Åpne appen og logg inn med e-posten og passordet ditt.'],
+      bad:  ['Denne lenken er ikke gyldig lenger', 'Bekreftelseslenker kan bare brukes én gang, og de utløper etter en stund. Åpne The Band Quiz og be om en ny bekreftelses-e-post.'],
+      none: ['The Band Quiz', 'Åpne The Band Quiz på telefonen og logg inn med e-posten og passordet ditt.'],
+      hint: 'Du kan lukke dette vinduet.'
+    },
+    hi: {
+      ok:   ['ईमेल की पुष्टि हो गई', 'आपका The Band Quiz खाता तैयार है। ऐप खोलें और अपने ईमेल और पासवर्ड से साइन इन करें।'],
+      bad:  ['यह लिंक अब मान्य नहीं है', 'पुष्टि लिंक सिर्फ़ एक बार इस्तेमाल हो सकते हैं और कुछ समय बाद समाप्त हो जाते हैं। The Band Quiz खोलें और नया पुष्टि ईमेल माँगें।'],
+      none: ['The Band Quiz', 'अपने फ़ोन में The Band Quiz खोलें और अपने ईमेल और पासवर्ड से साइन इन करें।'],
+      hint: 'अब आप यह विंडो बंद कर सकते हैं।'
+    },
+    ko: {
+      ok:   ['이메일이 확인되었습니다', 'The Band Quiz 계정이 준비되었습니다. 앱을 열고 이메일과 비밀번호로 로그인하세요.'],
+      bad:  ['이 링크는 더 이상 쓸 수 없습니다', '확인 링크는 한 번만 쓸 수 있고 시간이 지나면 만료됩니다. The Band Quiz를 열고 새 확인 이메일을 요청하세요.'],
+      none: ['The Band Quiz', '휴대폰에서 The Band Quiz를 열고 이메일과 비밀번호로 로그인하세요.'],
+      hint: '이 창은 닫아도 됩니다.'
     }
   };
 
-  var ORDER = ['en', 'sk', 'de', 'cs'];
+  // Same order as the app's own language picker.
+  var ORDER = ['en', 'sk', 'de', 'cs', 'es', 'fr', 'pt', 'nb', 'hi', 'ko'];
+  // Tags that don't match a key of their own: Norwegian reports 'no' or 'nn'.
+  var ALIAS = { no: 'nb', nn: 'nb' };
   var GLYPH = {
     ok:   'M20 6 9 17l-5-5',
     bad:  'M12 8v5M12 16.5v.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z',
@@ -230,6 +269,7 @@
 
   // Open in the visitor's own language when we speak it, else English.
   var pref = (navigator.language || 'en').slice(0, 2).toLowerCase();
+  pref = ALIAS[pref] || pref;
   render(ORDER.indexOf(pref) > -1 ? pref : 'en');
 })();
 </script>
